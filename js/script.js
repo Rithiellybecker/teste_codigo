@@ -4,7 +4,7 @@ const scanbutton = document.getElementById('scanbutton');
 const historicoEl = document.getElementById("historico");
 
 
-let historico = JSON.parse(localStorage.getItem('historico')) || [];
+let historico = JSON.parse(localStorage.getItem("historicoCodigos")) || [];
 
 function onScanSuccess(decodedText) {
   scanbutton.innerText = decodedText;
@@ -20,9 +20,13 @@ function onScanSuccess(decodedText) {
 
 atualizarHistorico();
 
-const scanner = new Html5QrcodeScanner("reader", {
-  fps: 10,
-  qrbox: 250
+scanbutton.addEventListener("click", () => {
+    const scanner = new Html5QrcodeScanner("reader", {
+        fps: 10,
+        qrbox: 250
+    });
+
+    scanner.render(onScanSuccess);
 });
 
 scanner.render(onScanSuccess);
@@ -39,7 +43,7 @@ function atualizarHistorico() {
     historico.forEach(item => {
         const li = document.createElement('li');
         li.textContent = item.codigo + ' - ' + item.data;
-        historico.appendChild(li);
+        historicoEl.appendChild(li);
     });
 }
 
