@@ -21,15 +21,19 @@ function onScanSuccess(decodedText) {
 atualizarHistorico();
 
 scanbutton.addEventListener("click", () => {
-    const scanner = new Html5QrcodeScanner("reader", {
-        fps: 10,
-        qrbox: 250
-    });
 
-    scanner.render(onScanSuccess);
+    // 🔥 evita criar vários scanners
+    if (!scanner) {
+        scanner = new Html5QrcodeScanner("reader", {
+            fps: 10,
+            qrbox: 250
+        });
+
+        scanner.render(onScanSuccess);
+    }
 });
 
-scanner.render(onScanSuccess);
+atualizarHistorico();
 
 function adicionarHistorico(codigo) {
     const data = new Date().toLocaleString();
