@@ -26,7 +26,7 @@ function atualizarHistorico() {
     const li = document.createElement("li");
     li.textContent = item.codigo + " - " + item.data;
     vencidosEl.appendChild(li);
-  })
+  });
 
 }
 
@@ -43,6 +43,10 @@ function onScanSuccess(decodedText) {
 
 
   const resposta = confirm("Esse item está vencido?");
+  const novo = {
+    codigo: decodedText,
+    data: new Date().toLocaleString()
+  };
 
   if (resposta) {
     vencidos.push(novo);
