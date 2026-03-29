@@ -20,35 +20,49 @@ function onScanSuccess(decodedText) {
 
 atualizarHistorico();
 
-scanbutton.addEventListener("click", () => {
+function onScanSuccess(decodedText) {
+  historico.push({
+    codigo: decodedText,
+    data: new Date().toLocaleString()
+  });
 
-    // 🔥 evita criar vários scanners
-    if (!scanner) {
-        scanner = new Html5QrcodeScanner("reader", {
-            fps: 10,
-            qrbox: 250
-        });
+  localStorage.setItem("historico", JSON.stringify(historico));
+  atualizarHistorico();
+}
 
-        scanner.render(onScanSuccess);
-    }
+scanbutton.addEventListener("click", async () => {
+  const devices = await Html5Qrcode.getCameras();
+
+  if (devices && devices.length) {
+    const cameraId = devices[0].id;
+
+    scanner.start(
+      cameraId,
+      {
+        fps: 10,
+        qrbox: 250
+      },
+      onScanSuccess
+    );
+  }
 });
 
 atualizarHistorico();
 
 function adicionarHistorico(codigo) {
-    const data = new Date().toLocaleString();
-    historico.push({ codigo, data });
-    localStorage.setItem('historico', JSON.stringify(historico));
-    atualizarHistorico();
+  const data = new Date().toLocaleString();
+  historico.push({ codigo, data });
+  localStorage.setItem('historico', JSON.stringify(historico));
+  atualizarHistorico();
 }
 
 function atualizarHistorico() {
-    historicoEl.innerHTML = '';
-    historico.forEach(item => {
-        const li = document.createElement('li');
-        li.textContent = item.codigo + ' - ' + item.data;
-        historicoEl.appendChild(li);
-    });
+  historicoEl.innerHTML = '';
+  historico.forEach(item => {
+    const li = document.createElement('li');
+    li.textContent = item.codigo + ' - ' + item.data;
+    historicoEl.appendChild(li);
+  });
 }
 
 if ("serviceWorker" in navigator) {
