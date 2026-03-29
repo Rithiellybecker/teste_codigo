@@ -36,24 +36,23 @@ function onScanSuccess(decodedText) {
     return;
   }
 
-  historico.push({
-    codigo: decodedText,
-    data: new Date().toLocaleString()
-  });
-
-
-  const resposta = confirm("Esse item está vencido?");
   const novo = {
     codigo: decodedText,
     data: new Date().toLocaleString()
   };
+
+  historico.push(novo);
+
+  const resposta = confirm("Esse item está vencido?");
 
   if (resposta) {
     vencidos.push(novo);
   }
 
   localStorage.setItem("historico", JSON.stringify(historico));
+  localStorage.setItem("vencidos", JSON.stringify(vencidos));
   atualizarHistorico();
+  atualizarVencidos();
 }
 
 // Carrega câmeras
@@ -98,3 +97,4 @@ scanbutton.addEventListener("click", async () => {
 
 carregarCameras();
 atualizarHistorico();
+atualizarVencidos();
