@@ -7,7 +7,7 @@ let historico = JSON.parse(localStorage.getItem("historico")) || [];
 let vencidos = JSON.parse(localStorage.getItem("vencidos")) || [];
 
 atualizarHistorico();
-atualizarVencidos();
+
 
 let scanner = new Html5Qrcode("reader");
 // adciona uma nova chamada e uma nova função e nao se duplica o scanbutton e o cameraSelect
@@ -52,7 +52,7 @@ function onScanSuccess(decodedText) {
   localStorage.setItem("historico", JSON.stringify(historico));
   localStorage.setItem("vencidos", JSON.stringify(vencidos));
   atualizarHistorico();
-  atualizarVencidos();
+  
 }
 
 // Carrega câmeras
@@ -97,4 +97,3 @@ scanbutton.addEventListener("click", async () => {
 
 carregarCameras();
 atualizarHistorico();
-atualizarVencidos();
