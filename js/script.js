@@ -1,70 +1,54 @@
-const input = document.getElementById('input');
-const button = document.getElementById('button');
-const scanbutton = document.getElementById('scanbutton');
 const historicoEl = document.getElementById("historico");
+const scanbutton = document.getElementById("scanbutton");
 
+let historico = JSON.parse(localStorage.getItem("historico")) || [];
 
-let historico = JSON.parse(localStorage.getItem("historicoCodigos")) || [];
+let scanner = new Html5Qrcode("reader");
 
-function onScanSuccess(decodedText) {
-  scanbutton.innerText = decodedText;
+// Atualiza histórico
+function atualizarHistorico() {
+    historicoEl.innerHTML = "";
 
-  historico.push({
-    codigo: decodedText,
-    data: new Date().toLocaleString()
-  });
-
-  localStorage.setItem("historicoCodigos", JSON.stringify(historico));
-  atualizarHistorico();
+    historico.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.codigo + " - " + item.data;
+        historicoEl.appendChild(li);
+    });
 }
 
-atualizarHistorico();
-
+// Quando escaneia
 function onScanSuccess(decodedText) {
-  historico.push({
-    codigo: decodedText,
-    data: new Date().toLocaleString()
-  });
 
-  localStorage.setItem("historico", JSON.stringify(historico));
-  atualizarHistorico();
+    // evita repetir mil vezes o mesmo código
+    if (historico.length && historico[historico.length - 1].codigo === decodedText) {
+        return;
+    }
+
+    historico.push({
+        codigo: decodedText,
+        data: new Date().toLocaleString()
+    });
+
+    localStorage.setItem("historico", JSON.stringify(historico));
+    atualizarHistorico();
 }
 
+// BOTÃO
 scanbutton.addEventListener("click", async () => {
-  const devices = await Html5Qrcode.getCameras();
 
-  if (devices && devices.length) {
-    const cameraId = devices[0].id;
+    try {
+        await scanner.start(
+            { facingMode: "environment" }, // 🔥 câmera traseira direto
+            {
+                fps: 10,
+                qrbox: { width: 250, height: 250 }
+            },
+            onScanSuccess
+        );
 
-    scanner.start(
-      cameraId,
-      {
-        fps: 10,
-        qrbox: 250
-      },
-      onScanSuccess
-    );
-  }
+    } catch (err) {
+        alert("Erro ao acessar câmera: " + err);
+    }
 });
 
 atualizarHistorico();
-
-function adicionarHistorico(codigo) {
-  const data = new Date().toLocaleString();
-  historico.push({ codigo, data });
-  localStorage.setItem('historico', JSON.stringify(historico));
-  atualizarHistorico();
-}
-
-function atualizarHistorico() {
-  historicoEl.innerHTML = '';
-  historico.forEach(item => {
-    const li = document.createElement('li');
-    li.textContent = item.codigo + ' - ' + item.data;
-    historicoEl.appendChild(li);
-  });
-}
-
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
