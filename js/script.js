@@ -1,5 +1,6 @@
 const historicoEl = document.getElementById("historico");
 const scanbutton = document.getElementById("scanbutton");
+const cameraSelect = document.getElementById("cameraSelect");
 
 let historico = JSON.parse(localStorage.getItem("historico")) || [];
 
@@ -16,9 +17,8 @@ function atualizarHistorico() {
     });
 }
 
+// Quando escaneia
 function onScanSuccess(decodedText) {
-
-    // evita repetir mil vezes o mesmo código
     if (historico.length && historico[historico.length - 1].codigo === decodedText) {
         return;
     }
@@ -32,28 +32,45 @@ function onScanSuccess(decodedText) {
     atualizarHistorico();
 }
 
-// BOTÃO
-const cameraSelect = document.getElementById("cameraSelect");
-
+// Carrega câmeras
 async function carregarCameras() {
-  const devices = await Html5Qrcode.getCameras();
+    try {
+        const devices = await Html5Qrcode.getCameras();
 
-  devices.forEach(device => {
-    const option = document.createElement("option");
-    option.value = device.id;
-    option.text = device.label || "Câmera";
-    cameraSelect.appendChild(option);
-  });
+        cameraSelect.innerHTML = "";
+
+        devices.forEach(device => {
+            const option = document.createElement("option");
+            option.value = device.id;
+            option.text = device.label || "Câmera";
+            cameraSelect.appendChild(option);
+        });
+
+    } catch (err) {
+        alert("Erro ao carregar câmeras: " + err);
+    }
 }
 
+// Botão
 scanbutton.addEventListener("click", async () => {
-  const cameraId = cameraSelect.value;
 
-  await scanner.start(
-    cameraId,
-    { fps: 10, qrbox: 250 },
-    onScanSuccess
-  );
+    const cameraId = cameraSelect.value;
+
+    if (!cameraId) {
+        alert("Selecione uma câmera primeiro");
+        return;
+    }
+
+    try {
+        await scanner.start(
+            cameraId,
+            { fps: 10, qrbox: 250 },
+            onScanSuccess
+        );
+    } catch (err) {
+        alert("Erro ao iniciar câmera: " + err);
+    }
 });
 
 carregarCameras();
+atualizarHistorico();
