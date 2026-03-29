@@ -16,7 +16,6 @@ function atualizarHistorico() {
     });
 }
 
-// Quando escaneia
 function onScanSuccess(decodedText) {
 
     // evita repetir mil vezes o mesmo código
@@ -34,21 +33,27 @@ function onScanSuccess(decodedText) {
 }
 
 // BOTÃO
+const cameraSelect = document.getElementById("cameraSelect");
+
+async function carregarCameras() {
+  const devices = await Html5Qrcode.getCameras();
+
+  devices.forEach(device => {
+    const option = document.createElement("option");
+    option.value = device.id;
+    option.text = device.label || "Câmera";
+    cameraSelect.appendChild(option);
+  });
+}
+
 scanbutton.addEventListener("click", async () => {
+  const cameraId = cameraSelect.value;
 
-    try {
-        await scanner.start(
-            { facingMode: "environment" }, // 🔥 câmera traseira direto
-            {
-                fps: 10,
-                qrbox: { width: 250, height: 250 }
-            },
-            onScanSuccess
-        );
-
-    } catch (err) {
-        alert("Erro ao acessar câmera: " + err);
-    }
+  await scanner.start(
+    cameraId,
+    { fps: 10, qrbox: 250 },
+    onScanSuccess
+  );
 });
 
-atualizarHistorico();
+carregarCameras();
